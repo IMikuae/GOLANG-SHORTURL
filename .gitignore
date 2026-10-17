@@ -1,0 +1,8 @@
+shorturl
+shorturl.exe
+url-shortener
+url-shortener.exe
+data/
+*.tmp
+*.db-shm
+*.db-wal

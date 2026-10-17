@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="id">
+<head>{{template "head" .}}</head>
+<body class="min-h-screen bg-background text-text-primary antialiased">
+{{template "dashshell" .}}
+<div class="mb-8">
+<h1 class="text-2xl font-bold tracking-tight text-text-primary">Pengaturan</h1>
+<p class="mt-1 text-sm text-text-secondary">Kelola akun dan preferensi kamu.</p>
+</div>
+<div class="space-y-6" data-email="{{.Email}}">
+<div class="overflow-hidden rounded-xl border bg-surface/60 border-white/10">
+<div class="flex items-start gap-3 border-b border-white/5 px-5 py-4">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-indigo-400">{{template "icon" dict "n" "o-user-circle" "c" "h-[18px] w-[18px]"}}</span>
+<div><h2 class="text-sm font-semibold text-text-primary">Account</h2>
+<p class="mt-0.5 text-xs text-text-muted">Email: {{.Email}} • Bergabung {{.Joined}}</p></div>
+</div>
+<div class="px-5 py-4">
+<form id="name-form">
+<label for="settings-name" class="block text-xs font-medium text-text-secondary">Nama tampilan</label>
+<div class="mt-2 flex flex-col gap-2 sm:flex-row">
+<input id="settings-name" type="text" value="{{.DisplayName}}" maxlength="60" placeholder="Nama kamu" class="min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-950/60 px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-text-muted focus:border-indigo-500/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+<button type="submit" id="name-save" class="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover">Simpan</button>
+</div>
+<p class="mt-1.5 text-[11px] text-text-muted">Nama ditampilkan di sidebar dashboard. 2–60 karakter.</p>
+</form>
+</div>
+</div>
+
+<div class="overflow-hidden rounded-xl border bg-surface/60 border-white/10">
+<div class="flex items-start gap-3 border-b border-white/5 px-5 py-4">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-indigo-400">{{template "icon" dict "n" "o-shield-check" "c" "h-[18px] w-[18px]"}}</span>
+<div><h2 class="text-sm font-semibold text-text-primary">Security</h2><p class="mt-0.5 text-xs text-text-muted">Password akun dan sesi login.</p></div>
+</div>
+<div class="px-5 py-4">
+<form id="pw-form" class="space-y-3">
+<div>
+<label for="current-password" class="block text-xs font-medium text-text-secondary">Password lama</label>
+<input id="current-password" type="password" autocomplete="current-password" placeholder="••••••••••••" class="mt-2 w-full min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-950/60 px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-text-muted focus:border-indigo-500/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+</div>
+<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+<div>
+<label for="new-password" class="block text-xs font-medium text-text-secondary">Password baru</label>
+<input id="new-password" type="password" autocomplete="new-password" placeholder="Minimal 8 karakter" class="mt-2 w-full min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-950/60 px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-text-muted focus:border-indigo-500/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+</div>
+<div>
+<label for="confirm-password" class="block text-xs font-medium text-text-secondary">Konfirmasi password baru</label>
+<input id="confirm-password" type="password" autocomplete="new-password" placeholder="Ulangi password baru" class="mt-2 w-full min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-950/60 px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-text-muted focus:border-indigo-500/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+</div>
+</div>
+<div id="pw-strength" class="hidden items-center gap-2">
+<span id="pw-strength-label" class="rounded-full px-2 py-0.5 text-[10px] font-semibold"></span>
+<span class="text-[11px] text-text-muted">Minimal 8 karakter, mengandung huruf dan angka.</span>
+</div>
+<p id="pw-mismatch" role="alert" class="hidden text-[11px] text-red-400">Konfirmasi password belum cocok.</p>
+<div class="flex flex-wrap items-center gap-3">
+<button type="submit" id="pw-save" class="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover">Ganti Password</button>
+<button type="button" id="pw-show" aria-pressed="false" class="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-medium text-text-secondary transition-colors hover:text-text-primary">{{template "icon" dict "n" "o-eye" "c" "h-3.5 w-3.5"}}<span>Tampilkan</span></button>
+</div>
+<p class="text-[11px] text-text-muted">Setelah password diganti, semua sesi di perangkat lain dicabut dan harus login ulang.</p>
+</form>
+</div>
+</div>
+
+<div class="overflow-hidden rounded-xl border bg-surface/60 border-white/10">
+<div class="flex items-start gap-3 border-b border-white/5 px-5 py-4">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-indigo-400">{{template "icon" dict "n" "o-globe-alt" "c" "h-[18px] w-[18px]"}}</span>
+<div><h2 class="text-sm font-semibold text-text-primary">Custom Domain</h2><p class="mt-0.5 text-xs text-text-muted" id="domain-desc">Pakai domain sendiri untuk tautan pendekmu.</p></div>
+</div>
+<div class="px-5 py-4">
+<div class="space-y-4">
+<form id="domain-add" class="flex flex-col gap-2 sm:flex-row">
+<input id="domain-host" type="text" placeholder="go.contoh.com" aria-label="Nama domain" autocomplete="off" spellcheck="false" class="min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-950/60 px-3.5 py-2.5 font-mono text-sm text-slate-100 placeholder:text-text-muted focus:border-indigo-500/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+<button type="submit" id="domain-add-btn" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover">{{template "icon" dict "n" "o-plus" "c" "h-4 w-4"}}<span>Tambah Domain</span></button>
+</form>
+<p id="domain-loading" class="text-xs text-text-muted">Memuat domain...</p>
+<div id="domain-empty" class="hidden rounded-lg border border-white/5 bg-white/[0.02] px-4 py-6 text-center">
+<span class="text-text-muted inline-block">{{template "icon" dict "n" "o-globe-alt" "c" "mx-auto h-8 w-8"}}</span>
+<p class="mt-3 text-xs text-text-secondary">Belum ada custom domain. Tambahkan satu untuk memakai tautanmu sendiri.</p>
+</div>
+<ul id="domain-list" class="space-y-3"></ul>
+<p class="text-[11px] text-text-muted">Setelah DNS diarahkan, tunggu propagasi (biasanya beberapa menit) lalu tekan Verifikasi. Cek manual dengan <code class="font-mono text-text-secondary">nslookup -type=TXT _yue-verify.domainmu.com</code>. Panduan lengkap ada di <a href="/dashboard/settings" class="font-medium text-indigo-400 hover:text-indigo-300">halaman pengaturan</a>.</p>
+</div>
+</div>
+</div>
+
+<div class="overflow-hidden rounded-xl border bg-surface/60 border-white/10">
+<div class="flex items-start gap-3 border-b border-white/5 px-5 py-4">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-indigo-400">{{template "icon" dict "n" "o-bell-slash" "c" "h-[18px] w-[18px]"}}</span>
+<div><h2 class="text-sm font-semibold text-text-primary">Notifications</h2><p class="mt-0.5 text-xs text-text-muted">Notifikasi email.</p></div>
+</div>
+<div class="px-5 py-4"><p class="text-xs text-text-secondary">Notifikasi email belum tersedia — pengiriman email belum ada backend-nya di server ini, jadi tidak ada preferensi yang bisa disimpan.</p></div>
+</div>
+
+<div class="overflow-hidden rounded-xl border bg-surface/60 border-red-500/25">
+<div class="flex items-start gap-3 border-b border-white/5 px-5 py-4">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-500/25 bg-red-500/10 text-red-400">{{template "icon" dict "n" "o-exclamation-triangle" "c" "h-[18px] w-[18px]"}}</span>
+<div><h2 class="text-sm font-semibold text-red-400">Danger Zone</h2><p class="mt-0.5 text-xs text-text-muted">Tindakan permanen yang tidak dapat dibatalkan.</p></div>
+</div>
+<div class="px-5 py-4">
+<div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+<p class="text-xs text-text-secondary">Hapus akun ini beserta {{.LinkCountFmt}} tautan dan seluruh statistiknya.</p>
+<button type="button" id="del-open" class="shrink-0 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-400 transition-colors hover:bg-red-500/20">Hapus Akun</button>
+</div>
+<form id="del-form" class="hidden animate-fade-in-up mt-4 rounded-xl border border-red-500/25 bg-red-500/[0.04] p-4">
+<h3 class="text-xs font-semibold text-red-400">Konfirmasi penghapusan akun</h3>
+<p class="mt-1.5 text-[11px] text-text-secondary">{{.LinkCountFmt}} tautan milikmu akan ikut terhapus beserta seluruh statistik kliknya, dan semua custom domain dilepas. Tindakan ini tidak dapat dibatalkan.</p>
+<label for="delete-email" class="mt-3 block text-xs font-medium text-text-secondary">Ketik ulang email <span class="font-mono text-text-primary">{{.Email}}</span> untuk konfirmasi</label>
+<input id="delete-email" type="email" autocomplete="off" placeholder="{{.Email}}" class="mt-2 w-full min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-950/60 px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-text-muted focus:border-indigo-500/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+<label for="delete-password" class="mt-3 block text-xs font-medium text-text-secondary">Password akun</label>
+<input id="delete-password" type="password" autocomplete="current-password" placeholder="••••••••••••" class="mt-2 w-full min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-950/60 px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-text-muted focus:border-indigo-500/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+<div class="mt-4 flex flex-wrap gap-2">
+<button type="submit" id="del-confirm" disabled class="rounded-lg border border-red-500/30 bg-red-500/15 px-4 py-2 text-xs font-semibold text-red-400 transition-colors hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-50">Hapus Akun Permanen</button>
+<button type="button" id="del-cancel" class="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-text-secondary transition-colors hover:text-text-primary">Batal</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+{{template "dashend" .}}
+{{template "foot" .}}
+<script>
+(function(){
+  const root=document.querySelector("[data-email]"),accountEmail=root.dataset.email;
+  // ── Nama ──
+  document.getElementById("name-form").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const btn=document.getElementById("name-save"),input=document.getElementById("settings-name"),name=input.value.trim();
+    if(name.length<2){toast("Nama minimal 2 karakter.","error");return;}
+    btn.disabled=true;const old=btn.textContent;btn.textContent="Menyimpan...";
+    try{
+      const r=await fetch("/api/account",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok){toast(d.error||"Gagal menyimpan nama.","error");return;}
+      toast("Nama berhasil disimpan.","success");location.reload();
+    }catch(err){toast("Tidak dapat menghubungi server.","error");}
+    finally{btn.disabled=false;btn.textContent=old;}
+  });
+  // ── Password ──
+  const cur=document.getElementById("current-password"),nw=document.getElementById("new-password"),cf=document.getElementById("confirm-password");
+  function strength(v){
+    if(!v)return{score:0,label:"Kosong",cls:"bg-white/10 text-text-muted"};
+    let s=0;if(v.length>=8)s++;if(v.length>=12)s++;if(/[a-z]/.test(v)&&/[A-Z]/.test(v))s++;if(/\d/.test(v))s++;if(/[^a-zA-Z0-9]/.test(v))s++;
+    s=Math.min(4,s);
+    return{score:s,label:["Sangat lemah","Lemah","Cukup","Kuat","Sangat kuat"][s],cls:["bg-red-500/15 text-red-400","bg-red-500/15 text-red-400","bg-amber-500/15 text-amber-400","bg-emerald-500/15 text-emerald-400","bg-emerald-500/15 text-emerald-400"][s]};
+  }
+  function paintPw(){
+    const box=document.getElementById("pw-strength");
+    if(!nw.value){box.classList.add("hidden");box.classList.remove("flex");}
+    else{box.classList.remove("hidden");box.classList.add("flex");const st=strength(nw.value);const l=document.getElementById("pw-strength-label");l.textContent=st.label;l.className="rounded-full px-2 py-0.5 text-[10px] font-semibold "+st.cls;}
+    document.getElementById("pw-mismatch").classList.toggle("hidden",!(cf.value&&cf.value!==nw.value));
+  }
+  nw.addEventListener("input",paintPw);cf.addEventListener("input",paintPw);
+  let showPw=false;
+  document.getElementById("pw-show").addEventListener("click",function(){
+    showPw=!showPw;[cur,nw,cf].forEach(i=>i.type=showPw?"text":"password");
+    this.setAttribute("aria-pressed",showPw?"true":"false");
+    this.querySelector("span").textContent=showPw?"Sembunyikan":"Tampilkan";
+  });
+  document.getElementById("pw-form").addEventListener("submit",async e=>{
+    e.preventDefault();
+    if(!cur.value){toast("Password lama wajib diisi.","error");return;}
+    if(nw.value.length<8){toast("Password baru minimal 8 karakter.","error");return;}
+    if(!/[a-zA-Z]/.test(nw.value)||!/\d/.test(nw.value)){toast("Password baru harus mengandung huruf dan angka.","error");return;}
+    if(nw.value!==cf.value){toast("Konfirmasi password tidak cocok.","error");return;}
+    if(nw.value===cur.value){toast("Password baru tidak boleh sama dengan password lama.","error");return;}
+    const btn=document.getElementById("pw-save");btn.disabled=true;const old=btn.textContent;btn.textContent="Menyimpan...";
+    try{
+      const r=await fetch("/api/account/password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({currentPassword:cur.value,newPassword:nw.value})});
+      const d=await r.json().catch(()=>({}));
+      if(r.status===429){toast(d.error||"Terlalu banyak percobaan. Coba lagi nanti.","warning");return;}
+      if(!r.ok){toast(d.error||"Gagal mengganti password.","error");return;}
+      cur.value="";nw.value="";cf.value="";paintPw();
+      toast("Password diganti. Perangkat lain harus login ulang.","success");
+    }catch(err){toast("Tidak dapat menghubungi server.","error");}
+    finally{btn.disabled=false;btn.textContent=old;}
+  });
+  // ── DomainManager ──
+  const list=document.getElementById("domain-list"),emptyBox=document.getElementById("domain-empty"),
+        loadingP=document.getElementById("domain-loading"),desc=document.getElementById("domain-desc");
+  const STYLES={verified:"border-emerald-500/30 bg-emerald-500/10 text-emerald-400",pending:"border-amber-500/30 bg-amber-500/10 text-amber-400",failed:"border-red-500/30 bg-red-500/10 text-red-400"};
+  const LABELS={verified:"Terverifikasi",pending:"Menunggu verifikasi",failed:"Verifikasi gagal"};
+  let busyId=null;
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+  async function loadDomains(){
+    loadingP.classList.remove("hidden");
+    try{
+      const r=await fetch("/api/domains");const d=await r.json().catch(()=>({}));
+      if(!r.ok)throw new Error(d.error||"Gagal memuat daftar domain.");
+      renderDomains(d.domains||[]);
+    }catch(err){toast(err.message,"error");renderDomains([]);}
+    finally{loadingP.classList.add("hidden");}
+  }
+  function renderDomains(domains){
+    list.innerHTML="";
+    emptyBox.classList.toggle("hidden",domains.length>0);
+    desc.textContent=domains.length>0?domains.length+" domain terdaftar. Arahkan DNS, verifikasi, lalu pakai saat membuat tautan.":"Pakai domain sendiri untuk tautan pendekmu.";
+    domains.forEach(d=>{
+      const li=document.createElement("li");
+      li.className="rounded-xl border border-white/10 bg-white/[0.02] p-4";
+      let inner='<div class="flex flex-wrap items-start justify-between gap-3"><div class="min-w-0">'+
+        '<p class="truncate font-mono text-sm text-text-primary">'+esc(d.hostname)+'</p>'+
+        '<div class="mt-1.5 flex flex-wrap items-center gap-2">'+
+        '<span class="rounded-full border px-2 py-0.5 text-[10px] font-semibold '+(STYLES[d.status]||STYLES.pending)+'">'+esc(LABELS[d.status]||d.status)+'</span>'+
+        '<span class="text-[11px] text-text-muted">'+d.linkCount+' tautan memakai domain ini</span></div></div>'+
+        '<div class="flex shrink-0 gap-2">'+
+        '<button type="button" data-vfy="'+d.id+'" class="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/25 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-300 transition-colors hover:bg-indigo-500/20"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="/static/icons.svg#o-arrow-path"/></svg>Verifikasi</button>'+
+        '<button type="button" data-del="'+d.id+'" data-host="'+esc(d.hostname)+'" data-count="'+d.linkCount+'" aria-label="Lepas domain '+esc(d.hostname)+'" class="inline-flex items-center gap-1.5 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/20"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="/static/icons.svg#o-trash"/></svg>Lepas</button>'+
+        '</div></div>';
+      if(d.status==="failed"&&d.lastError)
+        inner+='<p class="mt-3 flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2 text-[11px] text-red-400"><svg class="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true"><use href="/static/icons.svg#o-exclamation-triangle"/></svg><span>'+esc(d.lastError)+'</span></p>';
+      if(d.status==="verified")
+        inner+='<p class="mt-3 text-[11px] text-text-muted">Aktif sejak '+(d.verifiedAt?esc(d.verifiedAt):"—")+'. Tautan dengan domain ini disajikan hanya lewat host ini.</p>';
+      else{
+        inner+='<div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">';
+        inner+=dnsRow("Cara 1 — TXT (disarankan)",d.dns.txt.type,d.dns.txt.name,d.dns.txt.value);
+        if(d.dns.cnameRecord)inner+=dnsRow("Cara 2 — CNAME",d.dns.cnameRecord.type,d.dns.cnameRecord.name,d.dns.cnameRecord.value);
+        else inner+='<div class="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-[11px] text-amber-400">CNAME belum bisa dipakai: operator belum menyetel <code class="font-mono">APP_DOMAIN</code> / <code class="font-mono">NEXT_PUBLIC_APP_URL</code> di server.</div>';
+        inner+='</div>';
+      }
+      li.innerHTML=inner;list.appendChild(li);
+    });
+  }
+  function dnsRow(label,type,name,value){
+    return '<div class="rounded-lg border border-white/5 bg-white/[0.02] p-3">'+
+      '<p class="text-[11px] font-semibold uppercase tracking-wide text-text-muted">'+label+'</p>'+
+      '<dl class="mt-2 grid grid-cols-[64px_1fr] gap-x-3 gap-y-1 text-xs">'+
+      '<dt class="text-text-muted">Tipe</dt><dd class="font-mono text-text-secondary">'+esc(type)+'</dd>'+
+      '<dt class="text-text-muted">Nama</dt><dd class="break-all font-mono text-text-primary">'+esc(name)+'</dd>'+
+      '<dt class="text-text-muted">Nilai</dt><dd class="break-all font-mono text-cyan-300">'+esc(value)+'</dd></dl>'+
+      '<button type="button" data-copyval="'+esc(value)+'" data-label="'+esc(label)+'" class="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-text-secondary transition-colors hover:bg-white/10 hover:text-text-primary"><svg class="h-3.5 w-3.5" aria-hidden="true"><use href="/static/icons.svg#o-clipboard-document"/></svg>Salin nilai</button></div>';
+  }
+  document.getElementById("domain-add").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const input=document.getElementById("domain-host"),btn=document.getElementById("domain-add-btn"),v=input.value.trim();
+    if(!v){toast("Domain wajib diisi.","error");return;}
+    btn.disabled=true;
+    try{
+      const r=await fetch("/api/domains",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({hostname:v})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok){toast(d.error||"Gagal menambahkan domain.","error");return;}
+      input.value="";toast("Domain ditambahkan. Pasang record DNS lalu tekan Verifikasi.","success");loadDomains();
+    }catch(err){toast("Tidak dapat menghubungi server.","error");}
+    finally{btn.disabled=false;}
+  });
+  list.addEventListener("click",async e=>{
+    const cp=e.target.closest("[data-copyval]");
+    if(cp){if(await copyText(cp.dataset.copyval))toast(cp.dataset.label+" disalin.","success");else toast("Gagal menyalin. Salin manual dari kotak di samping.","error");return;}
+    const vf=e.target.closest("[data-vfy]");
+    if(vf){
+      if(busyId)return;busyId=vf.dataset.vfy;
+      try{
+        const r=await fetch("/api/domains/"+vf.dataset.vfy+"/verify",{method:"POST"});
+        const d=await r.json().catch(()=>({}));
+        if(r.status===429){toast(d.error||"Tunggu sebentar sebelum memeriksa lagi.","warning");return;}
+        if(!r.ok){toast(d.error||"Gagal memverifikasi domain.","error");return;}
+        if(d.status==="verified")toast("Domain terverifikasi lewat record "+d.method+".","success");
+        else toast(d.message||"DNS belum mengarah ke server ini.","warning");
+        loadDomains();
+      }catch(err){toast("Tidak dapat menghubungi server.","error");}
+      finally{busyId=null;}
+      return;
+    }
+    const del=e.target.closest("[data-del]");
+    if(del){
+      const n=Number(del.dataset.count||0);
+      const ok=await confirmDialog(n>0?("Lepas domain "+del.dataset.host+"? "+n+" tautan yang memakainya akan kembali ke domain utama (tautan tidak dihapus)."):("Lepas domain "+del.dataset.host+"?"));
+      if(!ok||busyId)return;busyId=del.dataset.del;
+      try{
+        const r=await fetch("/api/domains/"+del.dataset.del,{method:"DELETE"});
+        const d=await r.json().catch(()=>({}));
+        if(!r.ok){toast(d.error||"Gagal menghapus domain.","error");return;}
+        toast("Domain dilepas.","success");loadDomains();
+      }catch(err){toast("Tidak dapat menghubungi server.","error");}
+      finally{busyId=null;}
+    }
+  });
+  loadDomains();
+  // ── Hapus akun ──
+  const delForm=document.getElementById("del-form"),delEmail=document.getElementById("delete-email"),
+        delPw=document.getElementById("delete-password"),delBtn=document.getElementById("del-confirm");
+  document.getElementById("del-open").addEventListener("click",()=>{delPw.value="";delEmail.value="";delForm.classList.remove("hidden");});
+  document.getElementById("del-cancel").addEventListener("click",()=>delForm.classList.add("hidden"));
+  delEmail.addEventListener("input",()=>{delBtn.disabled=delEmail.value.trim().toLowerCase()!==accountEmail.toLowerCase();});
+  delForm.addEventListener("submit",async e=>{
+    e.preventDefault();
+    if(delEmail.value.trim().toLowerCase()!==accountEmail.toLowerCase()){toast("Email konfirmasi tidak cocok.","error");return;}
+    if(!delPw.value){toast("Password wajib diisi.","error");return;}
+    delBtn.disabled=true;const old=delBtn.textContent;delBtn.textContent="Menghapus...";
+    try{
+      const r=await fetch("/api/account",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:delPw.value})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok){toast(d.error||"Gagal menghapus akun.","error");return;}
+      location.href="/";
+    }catch(err){toast("Tidak dapat menghubungi server.","error");}
+    finally{delBtn.disabled=false;delBtn.textContent=old;}
+  });
+})();
+</script>
+</body>
+</html>

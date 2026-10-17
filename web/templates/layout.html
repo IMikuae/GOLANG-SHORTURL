@@ -1,0 +1,117 @@
+{{define "head"}}<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{.Title}}</title>
+<meta name="description" content="Ubah tautan panjang menjadi pendek, rapi, dan mudah dibagikan. Dilengkapi statistik, QR Code, password, dan banyak fitur lainnya.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
+@theme {
+  --color-background: #020617;
+  --color-surface: #0f172a;
+  --color-surface-elevated: #1e293b;
+  --color-border: #1e293b;
+  --color-border-strong: #334155;
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-primary: #6366f1;
+  --color-primary-hover: #818cf8;
+  --color-primary-soft: #1e1b4b;
+  --color-on-primary: #ffffff;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #ef4444;
+  --color-panel: #0a0e24;
+  --color-panel-nav: #0a0f26;
+  --color-chart-1: #6366f1;
+  --color-chart-2: #0891b2;
+  --color-chart-grid: #1e293b;
+}
+</style>
+<link rel="stylesheet" href="/static/style.css">{{end}}
+
+{{define "icon"}}<svg class="{{.c}}" aria-hidden="true"><use href="/static/icons.svg#{{.n}}"/></svg>{{end}}
+
+{{define "foot"}}<div id="toast-root" class="fixed top-4 right-4 z-[60] flex flex-col gap-2 max-sm:top-2 max-sm:right-2 max-sm:left-2 max-sm:items-center"></div>
+<div id="confirm-overlay" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+  <div id="confirm-box" role="dialog" aria-modal="true" class="bg-surface-elevated border border-border rounded-2xl p-6 max-w-sm mx-4 shadow-2xl shadow-black/50">
+    <p id="confirm-message" class="text-text-primary mb-6"></p>
+    <div class="flex gap-3 justify-end">
+      <button type="button" id="confirm-cancel" class="px-4 py-2 rounded-lg bg-surface border border-border text-text-secondary hover:text-text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40">Batal</button>
+      <button type="button" id="confirm-ok" class="px-4 py-2 rounded-lg bg-error text-slate-950 font-medium hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-error/50">Lanjutkan</button>
+    </div>
+  </div>
+</div>
+<script src="/static/app.js"></script>{{end}}
+
+{{define "dashshell"}}<div class="min-h-screen bg-background">
+<aside class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/5 bg-surface/50 backdrop-blur lg:flex">
+  <div class="flex h-16 items-center gap-2.5 border-b border-white/5 px-6">
+    <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white">{{template "icon" dict "n" "o-link" "c" "h-4 w-4"}}</span>
+    <span class="text-base font-bold tracking-tight text-text-primary">Yue Short</span>
+  </div>
+  <nav aria-label="Menu dashboard" class="flex-1 space-y-1 overflow-y-auto p-4">
+    {{range .Nav}}<a href="{{.Href}}"{{if .Active}} aria-current="page"{{end}} class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors {{if .Active}}bg-primary/15 text-indigo-300{{else}}text-text-secondary hover:bg-white/5 hover:text-text-primary{{end}}">{{template "icon" dict "n" .Icon "c" "h-5 w-5 shrink-0"}}{{.Label}}</a>{{end}}
+  </nav>
+  <div class="border-t border-white/5 p-4">
+    <div class="flex items-center gap-3 rounded-lg px-3 py-2">
+      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-sm font-bold text-indigo-300">{{.UserInitial}}</span>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-sm font-medium text-text-primary">{{.UserName}}</p>
+        <p class="truncate text-[11px] text-text-muted">Free Plan</p>
+      </div>
+    </div>
+    <button type="button" id="dash-logout" class="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-white/5 hover:text-text-primary">{{template "icon" dict "n" "o-arrow-left-on-rectangle" "c" "h-5 w-5 shrink-0"}}<span>Keluar</span></button>
+  </div>
+</aside>
+<header class="glass-nav fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between px-4 lg:hidden">
+  <a href="/dashboard" class="flex items-center gap-2">
+    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 text-white">{{template "icon" dict "n" "o-link" "c" "h-3.5 w-3.5"}}</span>
+    <span class="text-sm font-bold text-text-primary">Yue Short</span>
+  </a>
+  <button type="button" id="dash-menu-btn" aria-label="Buka menu" aria-expanded="false" class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-text-secondary">{{template "icon" dict "n" "o-bars-3" "c" "h-5 w-5"}}</button>
+</header>
+<div id="dash-drawer" class="hidden fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
+  <div id="dash-drawer-bg" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  <div class="animate-slide-in-right absolute inset-y-0 right-0 flex w-72 flex-col border-l border-white/10 bg-surface">
+    <div class="flex h-14 items-center justify-between border-b border-white/5 px-4">
+      <span class="text-sm font-bold text-text-primary">Menu</span>
+      <button type="button" id="dash-drawer-close" aria-label="Tutup menu" class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary hover:bg-white/5">{{template "icon" dict "n" "o-x-mark" "c" "h-5 w-5"}}</button>
+    </div>
+    <nav class="flex-1 space-y-1 overflow-y-auto p-4">
+      {{range .Nav}}<a href="{{.Href}}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{if .Active}}bg-primary/15 text-indigo-300{{else}}text-text-secondary hover:bg-white/5 hover:text-text-primary{{end}}">{{template "icon" dict "n" .Icon "c" "h-5 w-5 shrink-0"}}{{.Label}}</a>{{end}}
+      <button type="button" class="dash-logout-btn flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-white/5 hover:text-text-primary">{{template "icon" dict "n" "o-arrow-left-on-rectangle" "c" "h-5 w-5 shrink-0"}}Keluar</button>
+    </nav>
+    <div class="border-t border-white/5 p-4">
+      <p class="truncate text-sm font-medium text-text-primary">{{.UserName}}</p>
+      <p class="truncate text-xs text-text-muted">{{.UserEmail}}</p>
+    </div>
+  </div>
+</div>
+<div class="lg:pl-64">
+  <main class="mx-auto max-w-6xl px-4 pb-24 pt-20 sm:px-6 lg:px-8 lg:pb-16 lg:pt-8">{{end}}
+
+{{define "dashend"}}</main>
+</div>
+<nav aria-label="Navigasi bawah" class="fixed inset-x-0 bottom-0 z-40 border-t border-white/5 bg-surface/95 backdrop-blur lg:hidden" style="padding-bottom: env(safe-area-inset-bottom)">
+  <div class="grid grid-cols-5">
+    {{range .MobileNav}}<a href="{{.Href}}"{{if .Active}} aria-current="page"{{end}} class="flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition-colors {{if .Active}}text-indigo-400{{else}}text-text-muted hover:text-text-secondary{{end}}">{{template "icon" dict "n" .Icon "c" "h-5 w-5"}}{{.Label}}</a>{{end}}
+  </div>
+</nav>
+</div>
+<script>
+(function(){
+  const btn=document.getElementById("dash-menu-btn"), drawer=document.getElementById("dash-drawer");
+  function setOpen(v){ drawer.classList.toggle("hidden",!v); btn.setAttribute("aria-expanded",v?"true":"false"); }
+  btn.addEventListener("click",()=>setOpen(drawer.classList.contains("hidden")));
+  document.getElementById("dash-drawer-close").addEventListener("click",()=>setOpen(false));
+  document.getElementById("dash-drawer-bg").addEventListener("click",()=>setOpen(false));
+  let busy=false;
+  async function logout(b){ if(busy)return; busy=true; if(b)b.querySelector("span:last-child").textContent="Keluar...";
+    try{ await fetch("/api/auth/logout",{method:"POST"}); location.href="/"; } finally{ busy=false; } }
+  document.getElementById("dash-logout").addEventListener("click",function(){logout(this);});
+  document.querySelectorAll(".dash-logout-btn").forEach(b=>b.addEventListener("click",()=>logout(b)));
+})();
+</script>{{end}}

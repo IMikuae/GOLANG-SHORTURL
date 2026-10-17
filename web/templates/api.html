@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="id">
+<head>{{template "head" .}}</head>
+<body class="min-h-screen bg-background text-text-primary antialiased">
+{{template "dashshell" .}}
+<div class="mb-8">
+<h1 class="text-2xl font-bold tracking-tight text-text-primary">API Access</h1>
+<p class="mt-1 text-sm text-text-secondary">Integrasikan Yue Short ke proyek kamu lewat REST API.</p>
+</div>
+<div class="space-y-6">
+<div class="rounded-xl border border-white/10 bg-surface/60 p-5">
+<h2 class="text-sm font-semibold text-text-primary">API Key</h2>
+<div class="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+<code id="api-key" class="min-w-0 flex-1 truncate rounded-lg border border-white/10 bg-slate-950/80 px-4 py-3 font-mono text-sm text-cyan-300" data-full="{{.APIKey}}"></code>
+<div class="flex gap-2">
+<button type="button" id="key-toggle" class="rounded-lg border border-white/10 bg-white/5 px-3.5 py-3 text-xs font-medium text-text-secondary transition-colors hover:text-text-primary">Tampilkan</button>
+<button type="button" id="key-copy" aria-label="Salin API key" class="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-3 text-xs font-semibold text-white transition-colors hover:bg-primary-hover"></button>
+<button type="button" id="key-regen" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/25 bg-amber-500/10 px-3.5 py-3 text-xs font-medium text-amber-400 transition-colors hover:bg-amber-500/20 disabled:opacity-50">{{template "icon" dict "n" "o-arrow-path" "c" "h-3.5 w-3.5"}}Regenerate</button>
+</div>
+</div>
+<p class="mt-3 flex items-start gap-1.5 text-[11px] text-text-muted">{{template "icon" dict "n" "o-exclamation-triangle" "c" "h-3.5 w-3.5 shrink-0 text-amber-400"}}Jangan bagikan API key di kode publik. Simpan sebagai environment variable di sisi server.</p>
+</div>
+<div class="rounded-xl border border-white/10 bg-surface/60 p-5">
+<h2 class="flex items-center gap-2 text-sm font-semibold text-text-primary">{{template "icon" dict "n" "o-code-bracket" "c" "h-4 w-4 text-indigo-400"}}Endpoint</h2>
+<div class="mt-4 space-y-4">
+<div>
+<p class="text-xs font-medium text-text-secondary">Buat tautan pendek</p>
+<pre class="mt-2 overflow-x-auto rounded-lg border border-white/10 bg-slate-950/80 p-3.5 font-mono text-xs leading-relaxed text-cyan-300">POST /api/shorten
+Content-Type: application/json
+Authorization: Bearer &lt;API_KEY&gt;
+
+{ "url": "https://example.com/very/long", "alias": "docs" }</pre>
+</div>
+<div>
+<p class="text-xs font-medium text-text-secondary">Respons sukses (201)</p>
+<pre class="mt-2 overflow-x-auto rounded-lg border border-white/10 bg-slate-950/80 p-3.5 font-mono text-xs leading-relaxed text-emerald-300">{
+  "shortUrl": "{{.Origin}}/docs",
+  "shortCode": "docs"
+}</pre>
+</div>
+<div>
+<p class="text-xs font-medium text-text-secondary">Contoh dengan cURL</p>
+<pre class="mt-2 overflow-x-auto rounded-lg border border-white/10 bg-slate-950/80 p-3.5 font-mono text-xs leading-relaxed text-slate-300">curl -X POST {{.Origin}}/api/shorten \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer &lt;API_KEY&gt;" \
+  -d '{"url":"https://example.com"}'</pre>
+</div>
+</div>
+<div class="mt-5 space-y-2 border-t border-white/5 pt-4 text-xs text-text-muted">
+<p><span class="font-mono text-text-secondary">alias</span> (opsional) — slug kustom, huruf/angka/tanda hubung, maks 32 karakter.</p>
+<p><span class="font-mono text-text-secondary">password</span> (opsional) — minimal 4 karakter, tautan jadi terproteksi.</p>
+<p><span class="font-mono text-text-secondary">expiresAt</span> (opsional) — format YYYY-MM-DD, tidak boleh masa lalu.</p>
+<p><span class="font-mono text-text-secondary">domainId</span> (opsional) — ID custom domain milikmu yang sudah terverifikasi (lihat <span class="text-text-secondary">GET /api/domains</span>). Harus memakai header Authorization / sesi; tanpa itu ditolak.</p>
+<p>Tujuan yang menunjuk ke jaringan internal (localhost, 10.x, 172.16-31.x, 192.168.x, 169.254.x, 127.x, alamat IPv6 privat) selalu ditolak, dalam bentuk IPv4/IPv6/desimal/oktal/heksadesimal sekalipun.</p>
+<p>Tanpa header Authorization, tautan tetap bisa dibuat tetapi tidak terhubung ke akun manapun.</p>
+</div>
+</div>
+</div>
+{{template "dashend" .}}
+{{template "foot" .}}
+<script>
+(function(){
+  const code=document.getElementById("api-key"),copyBtn=document.getElementById("key-copy"),
+        toggleBtn=document.getElementById("key-toggle"),regenBtn=document.getElementById("key-regen");
+  let revealed=false,copied=false,current=code.dataset.full,busy=false;
+  const masked=k=>k.slice(0,8)+"••••••••••••••••"+k.slice(-4);
+  function paintCopy(){
+    copyBtn.innerHTML=copied
+      ?'<svg class="h-3.5 w-3.5" aria-hidden="true"><use href="/static/icons.svg#o-check"/></svg> Tersalin'
+      :'<svg class="h-3.5 w-3.5" aria-hidden="true"><use href="/static/icons.svg#o-clipboard-document"/></svg> Copy';
+  }
+  function paint(){code.textContent=revealed?current:masked(current);toggleBtn.textContent=revealed?"Sembunyikan":"Tampilkan";}
+  paint();paintCopy();
+  toggleBtn.addEventListener("click",()=>{revealed=!revealed;paint();});
+  copyBtn.addEventListener("click",async()=>{
+    if(await copyText(current)){copied=true;paintCopy();toast("API key disalin.","success");setTimeout(()=>{copied=false;paintCopy();},2000);}
+    else toast("Gagal menyalin API key.","error");
+  });
+  regenBtn.addEventListener("click",async()=>{
+    const ok=await confirmDialog("Regenerasi API key? Key lama langsung tidak berlaku dan semua integrasi yang memakainya akan berhenti bekerja.");
+    if(!ok||busy)return;busy=true;regenBtn.disabled=true;
+    try{
+      const r=await fetch("/api/account/api-key",{method:"POST"});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok){toast(d.error||"Gagal regenerasi API key.","error");return;}
+      current=d.apiKey;revealed=true;paint();toast("API key baru berhasil dibuat.","success");
+    }catch(e){toast("Tidak dapat menghubungi server.","error");}
+    finally{busy=false;regenBtn.disabled=false;}
+  });
+})();
+</script>
+</body>
+</html>

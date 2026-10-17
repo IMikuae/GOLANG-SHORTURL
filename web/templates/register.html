@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="id">
+<head>{{template "head" .}}</head>
+<body class="min-h-screen bg-background text-text-primary antialiased">
+<main class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-16">
+<div aria-hidden="true" class="ambient-glow"></div>
+<div class="animate-fade-in-up glass relative w-full max-w-md rounded-2xl p-6 shadow-2xl shadow-indigo-950/40 sm:p-8">
+<h1 class="text-center text-2xl font-bold text-text-primary">Buat Akun</h1>
+<p class="mt-2 text-center text-sm text-text-secondary">Kelola tautan, lihat statistik, dan dapatkan API key.</p>
+<form id="reg-form" class="mt-7 space-y-4" novalidate>
+<div>
+<label for="reg-name" class="block text-xs font-medium text-text-secondary">Nama <span class="text-text-muted">(opsional)</span></label>
+<div class="relative">
+<span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">{{template "icon" dict "n" "o-user" "c" "h-4 w-4"}}</span>
+<input id="reg-name" type="text" placeholder="Nama kamu" autocomplete="name" maxlength="60" class="mt-2 w-full rounded-xl border bg-slate-950/60 py-3 pl-11 pr-11 text-sm text-slate-100 placeholder:text-text-muted transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/60">
+</div>
+</div>
+<div>
+<label for="reg-email" class="block text-xs font-medium text-text-secondary">Email</label>
+<div class="relative">
+<span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">{{template "icon" dict "n" "o-envelope" "c" "h-4 w-4"}}</span>
+<input id="reg-email" type="email" placeholder="kamu@email.com" autocomplete="email" required class="mt-2 w-full rounded-xl border bg-slate-950/60 py-3 pl-11 pr-11 text-sm text-slate-100 placeholder:text-text-muted transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/60">
+</div>
+</div>
+<div>
+<label for="reg-password" class="block text-xs font-medium text-text-secondary">Password</label>
+<div class="relative">
+<span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">{{template "icon" dict "n" "o-lock-closed" "c" "h-4 w-4"}}</span>
+<input id="reg-password" type="password" placeholder="Minimal 8 karakter" autocomplete="new-password" required aria-describedby="password-rules" class="mt-2 w-full rounded-xl border bg-slate-950/60 py-3 pl-11 pr-11 text-sm text-slate-100 placeholder:text-text-muted transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/60">
+<button type="button" id="pw-toggle" aria-label="Tampilkan password" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-text-muted transition-colors hover:text-text-secondary">{{template "icon" dict "n" "o-eye" "c" "h-4 w-4"}}</button>
+</div>
+<ul id="password-rules" class="mt-2.5 grid grid-cols-1 gap-1.5 sm:grid-cols-3">
+<li data-rule="len" class="flex items-center gap-1.5 text-[11px] transition-colors text-text-muted"><span class="rule-icon">{{template "icon" dict "n" "o-x-circle" "c" "h-3.5 w-3.5 shrink-0 text-text-muted"}}</span>Minimal 8 karakter</li>
+<li data-rule="letter" class="flex items-center gap-1.5 text-[11px] transition-colors text-text-muted"><span class="rule-icon">{{template "icon" dict "n" "o-x-circle" "c" "h-3.5 w-3.5 shrink-0 text-text-muted"}}</span>Ada huruf</li>
+<li data-rule="digit" class="flex items-center gap-1.5 text-[11px] transition-colors text-text-muted"><span class="rule-icon">{{template "icon" dict "n" "o-x-circle" "c" "h-3.5 w-3.5 shrink-0 text-text-muted"}}</span>Ada angka</li>
+</ul>
+</div>
+<p id="form-err" role="alert" class="hidden items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3.5 py-2.5 text-xs text-red-400"><span aria-hidden="true">⚠</span><span id="form-err-msg"></span></p>
+<button type="submit" id="submit-btn" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:from-indigo-400 hover:to-violet-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 disabled:cursor-not-allowed disabled:opacity-50"><span id="submit-label" class="inline-flex items-center gap-2">Daftar {{template "icon" dict "n" "o-arrow-right" "c" "h-4 w-4"}}</span></button>
+</form>
+<p class="mt-6 text-center text-xs text-text-secondary">Sudah punya akun? <a href="/login" class="font-medium text-indigo-400 transition-colors hover:text-indigo-300">Masuk</a></p>
+</div>
+</main>
+{{template "foot" .}}
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const nameEl=$("reg-name"),emailEl=$("reg-email"),pwEl=$("reg-password"),btn=$("submit-btn"),label=$("submit-label");
+  let loading=false,showPw=false,touched=false;
+  const ICON_OK='<svg class="h-3.5 w-3.5 shrink-0 text-emerald-400" aria-hidden="true"><use href="/static/icons.svg#o-check-circle"/></svg>';
+  const ICON_NO='<svg class="h-3.5 w-3.5 shrink-0 text-text-muted" aria-hidden="true"><use href="/static/icons.svg#o-x-circle"/></svg>';
+  function checks(){return{len:pwEl.value.length>=8,letter:/[a-zA-Z]/.test(pwEl.value),digit:/\d/.test(pwEl.value)};}
+  function paint(){
+    const c=checks(),show=touched||pwEl.value.length>0;
+    document.querySelectorAll("#password-rules li").forEach(li=>{
+      const k=li.dataset.rule,pass=c[k];
+      li.className="flex items-center gap-1.5 text-[11px] transition-colors "+(!show?"text-text-muted":pass?"text-emerald-400":"text-text-muted");
+      li.querySelector(".rule-icon").innerHTML=(show&&pass)?ICON_OK:ICON_NO;
+    });
+    return c.len&&c.letter&&c.digit;
+  }
+  pwEl.addEventListener("input",()=>{touched=true;paint();hideErr();});
+  emailEl.addEventListener("input",hideErr);
+  $("pw-toggle").addEventListener("click",()=>{
+    showPw=!showPw;pwEl.type=showPw?"text":"password";
+    $("pw-toggle").setAttribute("aria-label",showPw?"Sembunyikan password":"Tampilkan password");
+    $("pw-toggle").innerHTML=showPw?'<svg class="h-4 w-4" aria-hidden="true"><use href="/static/icons.svg#o-eye-slash"/></svg>':'<svg class="h-4 w-4" aria-hidden="true"><use href="/static/icons.svg#o-eye"/></svg>';
+  });
+  function hideErr(){$("form-err").classList.add("hidden");$("form-err").classList.remove("flex");}
+  function showErr(m){$("form-err-msg").textContent=m;$("form-err").classList.remove("hidden");$("form-err").classList.add("flex");}
+  $("reg-form").addEventListener("submit",async e=>{
+    e.preventDefault();if(loading)return;
+    const ev=emailEl.value.trim();
+    if(!ev){showErr("Email wajib diisi.");return;}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ev)){showErr("Format email tidak valid.");return;}
+    if(!paint()){touched=true;paint();showErr("Password belum memenuhi syarat.");return;}
+    loading=true;btn.disabled=true;hideErr();
+    label.innerHTML='<span class="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span> Mendaftarkan...';
+    try{
+      const body={email:ev,password:pwEl.value};
+      if(nameEl.value.trim())body.name=nameEl.value.trim();
+      const r=await fetch("/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok){showErr(d.error||"Gagal mendaftar. Coba lagi.");return;}
+      location.href="/dashboard";
+    }catch(err){showErr("Tidak dapat menghubungi server. Periksa koneksi kamu.");}
+    finally{loading=false;btn.disabled=false;label.innerHTML='Daftar <svg class="h-4 w-4" aria-hidden="true"><use href="/static/icons.svg#o-arrow-right"/></svg>';}
+  });
+})();
+</script>
+</body>
+</html>

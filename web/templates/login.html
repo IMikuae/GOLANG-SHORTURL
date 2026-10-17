@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="id">
+<head>{{template "head" .}}</head>
+<body class="min-h-screen bg-background text-text-primary antialiased">
+<main class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-16">
+<div aria-hidden="true" class="ambient-glow"></div>
+<div class="animate-fade-in-up glass relative w-full max-w-md rounded-2xl p-6 shadow-2xl shadow-indigo-950/40 sm:p-8">
+<h1 class="text-center text-2xl font-bold text-text-primary">Masuk</h1>
+<p class="mt-2 text-center text-sm text-text-secondary">Selamat datang kembali di Yue Short.</p>
+<form id="login-form" class="mt-7 space-y-4" novalidate>
+<div>
+<label for="login-email" class="block text-xs font-medium text-text-secondary">Email</label>
+<div class="relative">
+<span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">{{template "icon" dict "n" "o-envelope" "c" "h-4 w-4"}}</span>
+<input id="login-email" type="email" placeholder="kamu@email.com" autocomplete="email" required class="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/60 py-3 pl-11 pr-4 text-sm text-slate-100 placeholder:text-text-muted transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/60">
+</div>
+<p id="email-err" role="alert" class="hidden mt-1.5 text-xs text-red-400"></p>
+</div>
+<div>
+<label for="login-password" class="block text-xs font-medium text-text-secondary">Password</label>
+<div class="relative">
+<span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">{{template "icon" dict "n" "o-lock-closed" "c" "h-4 w-4"}}</span>
+<input id="login-password" type="password" placeholder="Password kamu" autocomplete="current-password" required class="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/60 py-3 pl-11 pr-4 text-sm text-slate-100 placeholder:text-text-muted transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/60">
+</div>
+<p id="pw-err" role="alert" class="hidden mt-1.5 text-xs text-red-400"></p>
+</div>
+<p id="form-err" role="alert" class="hidden items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3.5 py-2.5 text-xs text-red-400"><span aria-hidden="true">⚠</span><span id="form-err-msg"></span></p>
+<button type="submit" id="submit-btn" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:from-indigo-400 hover:to-violet-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 disabled:cursor-not-allowed disabled:opacity-50"><span id="submit-label" class="inline-flex items-center gap-2">Masuk {{template "icon" dict "n" "o-arrow-right" "c" "h-4 w-4"}}</span></button>
+</form>
+<p class="mt-6 text-center text-xs text-text-secondary">Belum punya akun? <a href="/register" class="font-medium text-indigo-400 transition-colors hover:text-indigo-300">Daftar</a></p>
+</div>
+</main>
+{{template "foot" .}}
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const emailEl=$("login-email"),pwEl=$("login-password"),btn=$("submit-btn"),label=$("submit-label");
+  let loading=false;
+  function vEmail(v){ if(!v.trim())return "Email wajib diisi."; if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()))return "Format email tidak valid."; return ""; }
+  function live(){
+    const ee=emailEl.value?vEmail(emailEl.value):"",pe=pwEl.value?"":"";
+    $("email-err").textContent=ee;$("email-err").classList.toggle("hidden",!ee);
+    $("pw-err").classList.add("hidden");
+    hideFormErr();
+  }
+  function hideFormErr(){$("form-err").classList.add("hidden");$("form-err").classList.remove("flex");}
+  function showFormErr(m){$("form-err-msg").textContent=m;$("form-err").classList.remove("hidden");$("form-err").classList.add("flex");}
+  emailEl.addEventListener("input",live);pwEl.addEventListener("input",live);
+  $("login-form").addEventListener("submit",async e=>{
+    e.preventDefault();if(loading)return;
+    const ee=vEmail(emailEl.value);
+    if(ee||!pwEl.value){showFormErr(ee||"Password wajib diisi.");return;}
+    loading=true;btn.disabled=true;hideFormErr();
+    label.innerHTML='<span class="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span> Memeriksa...';
+    try{
+      const r=await fetch("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:emailEl.value.trim(),password:pwEl.value})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok){showFormErr(d.error||"Gagal masuk. Coba lagi.");return;}
+      location.href="/dashboard";
+    }catch(err){showFormErr("Tidak dapat menghubungi server. Periksa koneksi kamu.");}
+    finally{loading=false;btn.disabled=false;label.innerHTML='Masuk <svg class="h-4 w-4" aria-hidden="true"><use href="/static/icons.svg#o-arrow-right"/></svg>';}
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="id">
+<head>{{template "head" .}}</head>
+<body class="min-h-screen bg-background text-text-primary antialiased">
+<main class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-16">
+<div aria-hidden="true" class="ambient-glow"></div>
+<div id="gate-card" class="animate-fade-in-up glass w-full max-w-sm rounded-2xl p-6 shadow-2xl shadow-indigo-950/40"></div>
+</main>
+{{template "foot" .}}
+<script>
+(function(){
+  const qs=new URLSearchParams(location.search);
+  const code=qs.get("code")||"";
+  const host=qs.get("host")||"";
+  const card=document.getElementById("gate-card");
+  let password="",error="",notFound=false,loading=false;
+
+  function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+  function render(){
+    if(!code){
+      card.className="animate-fade-in-up glass w-full max-w-sm rounded-2xl p-6 text-center shadow-2xl shadow-indigo-950/40";
+      card.innerHTML='<div class="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-amber-500/25 bg-amber-500/10"><svg class="h-6 w-6 text-amber-400" aria-hidden="true"><use href="/static/icons.svg#o-exclamation-triangle"/></svg></div>'+
+      '<h1 class="text-lg font-bold text-text-primary">Tautan Tidak Valid</h1>'+
+      '<p class="mt-1.5 text-xs leading-relaxed text-text-secondary">Alamat ini tidak memuat kode tautan. Pastikan kamu membuka tautan pendek yang benar.</p>'+
+      '<a href="/" class="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:from-indigo-400 hover:to-violet-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/50">Kembali ke Beranda</a>';
+      return;
+    }
+    if(notFound){
+      card.className="animate-fade-in-up glass w-full max-w-sm rounded-2xl p-6 text-center shadow-2xl shadow-indigo-950/40";
+      card.innerHTML='<div class="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-amber-500/25 bg-amber-500/10"><svg class="h-6 w-6 text-amber-400" aria-hidden="true"><use href="/static/icons.svg#o-exclamation-triangle"/></svg></div>'+
+      '<h1 class="text-lg font-bold text-text-primary">Tautan Tidak Ditemukan</h1>'+
+      '<p class="mt-1.5 text-xs leading-relaxed text-text-secondary">Tautan <span class="font-mono text-cyan-300">/'+esc(code)+'</span> tidak ada, sudah dihapus, atau sudah kedaluwarsa.</p>'+
+      '<a href="/" class="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:from-indigo-400 hover:to-violet-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/50">Kembali ke Beranda</a>';
+      return;
+    }
+    card.className="animate-fade-in-up glass w-full max-w-sm rounded-2xl p-6 shadow-2xl shadow-indigo-950/40";
+    card.innerHTML=
+    '<div class="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-indigo-500/25 bg-indigo-500/10"><svg class="h-6 w-6 text-indigo-400" aria-hidden="true"><use href="/static/icons.svg#o-lock-closed"/></svg></div>'+
+    '<h1 class="text-center text-lg font-bold text-text-primary">Tautan Terproteksi</h1>'+
+    '<p class="mt-1.5 text-center text-xs text-text-secondary">Masukkan password untuk membuka tautan <span class="font-mono text-cyan-300">/'+esc(code)+'</span></p>'+
+    '<form id="gate-form" method="get" class="mt-6">'+
+    '<input type="hidden" name="code" value="'+esc(code)+'">'+(host?'<input type="hidden" name="host" value="'+esc(host)+'">':"")+
+    '<label for="gate-password" class="block text-xs font-medium text-text-secondary">Password</label>'+
+    '<input id="gate-password" type="password" placeholder="••••••••••••" autocomplete="off" autofocus'+(loading?" disabled":"")+' aria-invalid="'+(error?"true":"false")+'"'+(error?' aria-describedby="gate-error"':"")+' value="'+esc(password)+'" class="mt-2 w-full rounded-xl border bg-slate-950/60 px-4 py-3 text-sm text-slate-100 placeholder:text-text-muted transition-colors focus:outline-none focus:ring-2 disabled:opacity-60 '+(error?"border-red-500/50 focus:border-red-500/60 focus:ring-red-500/20":"border-white/10 focus:border-indigo-500/60 focus:ring-indigo-500/20")+'">'+
+    (error?'<p id="gate-error" role="alert" class="mt-2 flex items-start gap-1.5 text-xs text-red-400"><span aria-hidden="true">⚠</span><span>'+esc(error)+'</span></p>':"")+
+    '<button type="submit"'+(loading?" disabled":"")+' class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:from-indigo-400 hover:to-violet-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 disabled:cursor-not-allowed disabled:opacity-50">'+(loading?'<span class="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span> Memeriksa...':'Buka Tautan <svg class="h-4 w-4" aria-hidden="true"><use href="/static/icons.svg#o-arrow-right"/></svg>')+'</button>'+
+    '</form><p class="mt-6 text-center text-xs text-text-muted"><a href="/" class="transition-colors hover:text-text-secondary">← Kembali ke Beranda</a></p>';
+
+    const input=document.getElementById("gate-password");
+    input.addEventListener("input",()=>{password=input.value;if(error){error="";render();document.getElementById("gate-password").focus();}});
+    document.getElementById("gate-form").addEventListener("submit",submit);
+  }
+
+  function safeTarget(v){
+    try{const p=new URL(v);if(p.protocol!=="http:"&&p.protocol!=="https:")return null;return p.toString();}catch(e){return null;}
+  }
+  async function submit(e){
+    e.preventDefault();if(loading)return;
+    password=document.getElementById("gate-password").value;
+    if(!password.trim()){error="Password wajib diisi.";render();return;}
+    loading=true;error="";render();
+    try{
+      const body={code:code,password:password};if(host)body.host=host;
+      const r=await fetch("/api/unlock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok){
+        if(r.status===404){notFound=true;render();return;}
+        error=d.error||"Gagal membuka tautan.";loading=false;render();return;
+      }
+      const dest=safeTarget(d.redirect);
+      if(!dest){error="Tujuan tautan tidak valid.";loading=false;render();return;}
+      location.replace(dest);
+    }catch(err){error="Tidak dapat menghubungi server. Periksa koneksi kamu.";loading=false;render();}
+  }
+  render();
+})();
+</script>
+</body>
+</html>
